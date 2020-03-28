@@ -1,12 +1,9 @@
 import java.awt.*;
+import java.util.*;
 import java.io.*;
 import java.util.HashMap;
-import java.util.Map; 
 
 public class Templates {
-    public static final int N = 64; //num points in processed template/input
-    public static final int DIMEN = 100; //width of bounding box
-
     public static final String[] KEYS_ALPHABET =
         {"a","b","c","d","e","f","g","h","i","j","k","l","m",
          "n","o","p","q","r","s","t","u","v","w","x","y","z"};
@@ -16,34 +13,35 @@ public class Templates {
     public static final String[] KEYS_COMMAND = {};
 
     public HashMap<String, Point[]> gestures;
-    public sArrayList<String> keys;
+    public ArrayList<String> keys;
 
     public Templates(){
         this.gestures = new HashMap<>();
         this.keys = new ArrayList<String>();
     }
 
-    public add_raw(String sym, Point[] raw_gesture) {
-        template = resample(template, 64);
-
-        template = rotate_to_0(template);
-        template = scale_to_square(template);
-        template = translate_to_origin(template);
-        System.out.println(template);
-        
-
-        create_template(template);
-
-        return template;
-    }
+    public void add_raw(String sym, Point[] raw_gesture) {
+        Point[] gesture = Template.process_gesture(raw_gesture);
+        add_processed(sym, gesture);
     }
 
-    public add_processed(String sym, Point[] gesture) {
+    public void add_raw(String sym, ArrayList<Point> raw_gesture) {
+        Point[] gesture = Template.process_gesture(raw_gesture);
+        add_processed(sym, gesture);
+    }
+
+    public void add_processed(String sym, Point[] gesture) {
         this.gestures.put(sym, gesture);
         this.keys.add(sym);
     }
+    
+    public Point[] get(String sym) {
+        Point[] gesture =  this.gestures.get(sym);
+        Painter.display(gesture);
+        return gesture;
+    }
 
-    public remove(String sym) {
+    public void remove(String sym) {
         this.gestures.remove(sym);
         this.keys.remove(sym);
     }
@@ -78,15 +76,9 @@ public class Templates {
 		} catch (IOException e) {
 			System.out.println("Error initializing stream");
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-
-        return void;
+        }
+        return null;
     }
-
-	public static void main(String[] args) {
-
-	}
 
 }

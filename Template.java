@@ -1,16 +1,23 @@
 import java.awt.*;
+import java.util.*;
+import javafx.util.Pair;
+
 
 public class Template 
 {
-	public static Point[] process_gesture(Point[] raw_points) {
-		points = new ArrayList<Point>(Arrays.asList(raw_points));
-        points = resample(points, 64);
-        points = rotate_to_0(points);
-        points = scale_to_square(points);
-        points = translate_to_origin(points);
+	public static Point[] process_gesture(ArrayList<Point> raw_points) {
+        raw_points = resample(raw_points, 64);
+        raw_points = rotate_to_0(raw_points);
+        raw_points = scale_to_square(raw_points);
+        raw_points = translate_to_origin(raw_points);
 
-		Point[] template = points.toArray();
+		Point[] template = (Point[]) raw_points.toArray();
         return template;
+    }
+
+	public static Point[] process_gesture(Point[] raw_points) {
+		ArrayList<Point> points = new ArrayList<Point>(Arrays.asList(raw_points));
+		return process_gesture(points);
     }
 
 	public static ArrayList<Point> deepCopyPoints(ArrayList<Point> points_input) {
@@ -90,7 +97,7 @@ public class Template
 	}
 
 	public static Pair<Point, Point> bounding_box(ArrayList<Point> points) {
-		Point topleft = new Point(dimen, dimen);
+		Point topleft = new Point(Recognizer.DIMEN, Recognizer.DIMEN);
 		Point botright = new Point(0, 0);
 		for (Point p : points) {
 			if (p.x < topleft.x) {
@@ -117,8 +124,8 @@ public class Template
 		int height = points_bb.getValue().y - points_bb.getKey().y;
 		for (Point p : points) {
 			Point q = new Point();
-			q.x = (int) Math.round(p.x * ((float) Grafitti.dimen / width));
-			q.y = (int) Math.round(p.y * ((float) Grafitti.dimen / height));
+			q.x = (int) Math.round(p.x * ((float) Recognizer.DIMEN / width));
+			q.y = (int) Math.round(p.y * ((float) Recognizer.DIMEN / height));
 			newPoints.add(q);
 		}
 		return newPoints;
@@ -129,8 +136,8 @@ public class Template
 		ArrayList<Point> newPoints = new ArrayList<Point>();
 		for (Point p : points) {
 			Point q = new Point();
-			q.x = p.x + (Grafitti.dimen / 2 - c.x);
-			q.y = p.y + (Grafitti.dimen / 2 - c.y);
+			q.x = p.x + (Recognizer.DIMEN / 2 - c.x);
+			q.y = p.y + (Recognizer.DIMEN / 2 - c.y);
 			newPoints.add(q);
 		}
 		return newPoints;

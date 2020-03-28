@@ -68,7 +68,7 @@ public static void sleep(int i){
     }
 }
 
-public static ArrayList<Point> drawPoints(){
+public static Point[] draw(){
     final JFrame f = new JFrame();
 
     ArrayList<Point> points = new ArrayList<Point>();
@@ -84,10 +84,11 @@ public static ArrayList<Point> drawPoints(){
     }
     f.dispose();
     
-    return(HI.points);
+    return((Point[]) HI.points.toArray());
 }
 
-public static ArrayList<Point> displayPoints(ArrayList<Point> points){
+public static ArrayList<Point> display(Point[] points_input){
+    ArrayList<Point> points = new ArrayList<Point>(Arrays.asList(points_input));
     final JFrame f = new JFrame();
 
     Painter HI = new Painter(points, "r");
