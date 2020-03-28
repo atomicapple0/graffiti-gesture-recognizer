@@ -11,7 +11,7 @@ public class Template
         raw_points = scale_to_square(raw_points);
         raw_points = translate_to_origin(raw_points);
 
-		Point[] template = (Point[]) raw_points.toArray();
+		Point[] template = (Point[]) raw_points.toArray(new Point[raw_points.size()]);
         return template;
     }
 
