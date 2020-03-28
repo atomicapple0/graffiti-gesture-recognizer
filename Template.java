@@ -1,14 +1,17 @@
 import java.awt.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 
 public class Template 
 {
+	public static Point[] process_gesture(Point[] raw_points) {
+		points = new ArrayList<Point>(Arrays.asList(raw_points));
+        points = resample(points, 64);
+        points = rotate_to_0(points);
+        points = scale_to_square(points);
+        points = translate_to_origin(points);
+
+		Point[] template = points.toArray();
+        return template;
+    }
 
 	public static ArrayList<Point> deepCopyPoints(ArrayList<Point> points_input) {
 		ArrayList<Point> points = new ArrayList<Point>();
