@@ -5,13 +5,15 @@ import javafx.util.Pair;
 
 public class Template 
 {
+	public static final int N = 64; //num points in processed template/input
+	public static final int DIMEN = 100; //width of bounding box
+	
 	public static Point[] process_gesture(ArrayList<Point> raw_points) {
-        raw_points = resample(raw_points, 64);
-        raw_points = rotate_to_0(raw_points);
-        raw_points = scale_to_square(raw_points);
-        raw_points = translate_to_origin(raw_points);
-
-		Point[] template = (Point[]) raw_points.toArray(new Point[raw_points.size()]);
+		raw_points = resample(raw_points, Template.N);
+		
+        Point[] template = rotate_to_0(raw_points);
+        template = scale_to_square(template);
+        template = translate_to_origin(template);
         return template;
     }
 
@@ -63,41 +65,47 @@ public class Template
 		return newPoints;
 	}
 
-	public static Point centroid(ArrayList<Point> points) {
+	public static Point centroid(Point[] points) {
 		double centroidX = 0, centroidY = 0;
 		for (Point p : points) {
 			centroidX += p.x;
 			centroidY += p.y;
 		}
-		return new Point((int) Math.round(centroidX / points.size()), (int) Math.round(centroidY / points.size()));
+		return new Point((int) Math.round(centroidX / Template.N), (int) Math.round(centroidY / Template.N));
 	}
 
-	public static ArrayList<Point> rotate_by(ArrayList<Point> points, double angle) {
-		ArrayList<Point> newPoints = new ArrayList<Point>();
+	public static Point[] rotate_by(Point[] points, double angle) {
+		Point[] newPoints = new Point[Template.N];
 		Point c = centroid(points);
 
 		double cosVal = Math.cos(angle);
 		double sinVal = Math.sin(angle);
 
-		for (Point p : points) {
-			newPoints.add(new Point((int) (Math.round((p.x - c.x) * cosVal - (p.y - c.y) * sinVal + c.x)),
+		for (int i = 0; i < Template.N; i++) {
+			Point p = points[i];
+			newPoints[i] = (new Point((int) (Math.round((p.x - c.x) * cosVal - (p.y - c.y) * sinVal + c.x)),
 					(int) (Math.round((p.x - c.x) * sinVal + (p.y - c.y) * cosVal + c.y))));
 		}
 		return newPoints;
 	}
 
-	public static ArrayList<Point> rotate_to_0(ArrayList<Point> points) {
+	public static Point[] rotate_to_0(Point[] points) {
 		Point c = centroid(points);
-		Point p_0 = points.get(0);
+		Point p_0 = points[0];
 		double angle = Math.atan(((double) c.y - p_0.y) / ((double) c.x - p_0.x));
 
-		ArrayList<Point> newPoints = rotate_by(points, angle);
+		Point[] newPoints = rotate_by(points, angle);
 
 		return newPoints;
 	}
 
-	public static Pair<Point, Point> bounding_box(ArrayList<Point> points) {
-		Point topleft = new Point(Recognizer.DIMEN, Recognizer.DIMEN);
+	public static Point[] rotate_to_0(ArrayList<Point> raw_points) {
+		Point[] points = raw_points.toArray(new Point[Template.N]);  
+		return rotate_to_0(points);
+	}
+
+	public static Pair<Point, Point> bounding_box(Point[] points) {
+		Point topleft = new Point(Template.DIMEN, Template.DIMEN);
 		Point botright = new Point(0, 0);
 		for (Point p : points) {
 			if (p.x < topleft.x) {
@@ -117,28 +125,30 @@ public class Template
 		return new Pair<Point, Point>(topleft, botright);
 	}
 
-	public static ArrayList<Point> scale_to_square(ArrayList<Point> points) {
-		ArrayList<Point> newPoints = new ArrayList<Point>();
+	public static Point[] scale_to_square(Point[] points) {
+		Point[] newPoints = new Point[Template.N];
 		Pair<Point, Point> points_bb = bounding_box(points);
 		int width = points_bb.getValue().x - points_bb.getKey().x;
 		int height = points_bb.getValue().y - points_bb.getKey().y;
-		for (Point p : points) {
+		for (int i = 0; i < Template.N; i++) {
+			Point p = points[i];
 			Point q = new Point();
-			q.x = (int) Math.round(p.x * ((float) Recognizer.DIMEN / width));
-			q.y = (int) Math.round(p.y * ((float) Recognizer.DIMEN / height));
-			newPoints.add(q);
+			q.x = (int) Math.round(p.x * ((float) Template.DIMEN / width));
+			q.y = (int) Math.round(p.y * ((float) Template.DIMEN / height));
+			newPoints[i] = q;
 		}
 		return newPoints;
 	}
 
-	public static ArrayList<Point> translate_to_origin(ArrayList<Point> points) {
+	public static Point[] translate_to_origin(Point[] points) {
 		Point c = centroid(points);
-		ArrayList<Point> newPoints = new ArrayList<Point>();
-		for (Point p : points) {
+		Point[] newPoints = new Point[Template.N];
+		for (int i = 0; i < Template.N; i++) {
+			Point p = points[i];
 			Point q = new Point();
-			q.x = p.x + (Recognizer.DIMEN / 2 - c.x);
-			q.y = p.y + (Recognizer.DIMEN / 2 - c.y);
-			newPoints.add(q);
+			q.x = p.x + (Template.DIMEN / 2 - c.x);
+			q.y = p.y + (Template.DIMEN / 2 - c.y);
+			newPoints[i] = q;
 		}
 		return newPoints;
 	}

@@ -91,7 +91,7 @@ public Painter(ArrayList<Point> points, String mode) {
 
     public static ArrayList<Point> display(Point[] points_input){
         ArrayList<Point> points = new ArrayList<Point>(Arrays.asList(points_input));
-        double ratio = VIEWER_DIMEN / Recognizer.DIMEN;
+        double ratio = (0.75) * (VIEWER_DIMEN / Template.DIMEN);
         for (Point p : points) {
             p.x *= ratio;
             p.y *= ratio;

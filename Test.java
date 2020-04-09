@@ -1,12 +1,15 @@
 class Test{
     public static void main(String[] args) {
-
-        Templates templates = new Templates();
-        templates.add_raw("a", Painter.draw());
-        templates.add_raw("b", Painter.draw());
-        templates.get("a");
-
         
-
+        
+        Library lib = Library.load_file("library.dat");
+        
+        char sym = '0';
+        System.out.println(sym);
+        lib.add_raw(sym, Painter.draw());
+        lib.get(sym);
+        
+        
+        
     }
 }

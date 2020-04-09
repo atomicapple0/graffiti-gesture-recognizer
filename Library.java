@@ -3,50 +3,51 @@ import java.util.*;
 import java.io.*;
 import java.util.HashMap;
 
-public class Templates {
-    public static final String[] KEYS_ALPHABET =
-        {"a","b","c","d","e","f","g","h","i","j","k","l","m",
-         "n","o","p","q","r","s","t","u","v","w","x","y","z"};
-    public static final String[] KEYS_DIGIT =
-        {"1","2","3","4","5","6","7","8","9","0"};
+public class Library implements Serializable {
+    public static final char[] KEYS_ALPHABET =
+        {'a','b','c','d','e','f','g','h','i','j','k','l','m',
+         'n','o','p','q','r','s','t','u','v','w','x','y','z'};
+    public static final char[] KEYS_DIGIT =
+        {'1','2','3','4','5','6','7','8','9','0'};
     public static final String[] KEYS_SPECIAL = {};
     public static final String[] KEYS_COMMAND = {};
 
-    public HashMap<String, Point[]> gestures;
-    public ArrayList<String> keys;
+    public HashMap<Character, Point[]> gestures;
+    public ArrayList<Character> keys;
 
-    public Templates(){
+    public Library(){
+        super();
         this.gestures = new HashMap<>();
-        this.keys = new ArrayList<String>();
+        this.keys = new ArrayList<Character>();
     }
 
-    public void add_raw(String sym, Point[] raw_gesture) {
+    public void add_raw(char sym, Point[] raw_gesture) {
         Point[] gesture = Template.process_gesture(raw_gesture);
         add_processed(sym, gesture);
     }
 
-    public void add_raw(String sym, ArrayList<Point> raw_gesture) {
+    public void add_raw(char sym, ArrayList<Point> raw_gesture) {
         Point[] gesture = Template.process_gesture(raw_gesture);
         add_processed(sym, gesture);
     }
 
-    public void add_processed(String sym, Point[] gesture) {
+    public void add_processed(char sym, Point[] gesture) {
         this.gestures.put(sym, gesture);
         this.keys.add(sym);
     }
     
-    public Point[] get(String sym) {
+    public Point[] get(char sym) {
         Point[] gesture =  this.gestures.get(sym);
         Painter.display(gesture);
         return gesture;
     }
 
-    public void remove(String sym) {
+    public void remove(char sym) {
         this.gestures.remove(sym);
         this.keys.remove(sym);
     }
 
-    public static void save_templates(String path, Templates obj) {
+    public static void save_file(String path, Library obj) {
         try {
 			FileOutputStream f = new FileOutputStream(new File(path));
 			ObjectOutputStream o = new ObjectOutputStream(f);
@@ -60,12 +61,12 @@ public class Templates {
 		} 
     }
 
-    public static Templates load_templates(String path){
+    public static Library load_file(String path){
         try {
 			FileInputStream fi = new FileInputStream(new File(path));
 			ObjectInputStream oi = new ObjectInputStream(fi);
 
-			Templates obj = (Templates) oi.readObject();
+			Library obj = (Library) oi.readObject();
 
 			oi.close(); fi.close();
 
