@@ -35,9 +35,14 @@ public class Library implements Serializable {
         this.gestures.put(sym, gesture);
         this.keys.add(sym);
     }
-    
+
     public Point[] get(char sym) {
-        Point[] gesture =  this.gestures.get(sym);
+        Point[] gesture = this.gestures.get(sym);
+        return gesture;
+    }
+    
+    public Point[] view(char sym) {
+        Point[] gesture = this.get(sym);
         Painter.display(gesture);
         return gesture;
     }

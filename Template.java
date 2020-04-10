@@ -5,11 +5,27 @@ import javafx.util.Pair;
 
 public class Template 
 {
-	public static final int N = 64; //num points in processed template/input
+	public static final int N = 32; //num points in processed template/input
 	public static final int DIMEN = 100; //width of bounding box
+
+	public static Point[] toArray(ArrayList<Point> raw_points, int n) {
+		Point[] points = new Point[n];
+		for (int i = 0; i < n; i++) {
+			points[i] = raw_points.get(i);
+		}
+		return points;
+	}
+
+	public static Point[] toArray(ArrayList<Point> raw_points) {
+		return toArray(raw_points, Template.N);
+	}
 	
 	public static Point[] process_gesture(ArrayList<Point> raw_points) {
-		raw_points = resample(raw_points, Template.N);
+		if (raw_points.size() < 5) {
+			throw new Error("not enough points");
+		}
+
+		raw_points = resample(raw_points);
 		
         Point[] template = rotate_to_0(raw_points);
         template = scale_to_square(template);
@@ -38,22 +54,27 @@ public class Template
 		return d;
 	}
 
-	public static ArrayList<Point> resample(ArrayList<Point> points_input, int n) {
-
+	public static ArrayList<Point> resample(ArrayList<Point> points_input) {
+		
+		int n = Template.N;
 		ArrayList<Point> points = deepCopyPoints(points_input);
 
 		double I = pathLength(points) / (n - 1);
+		if (I < 1) {
+			throw new Error("points are too close together");
+		}
 		double D = 0;
 		ArrayList<Point> newPoints = new ArrayList<Point>();
 		newPoints.add(points.get(0));
 
 		for (int i = 1; i < points.size(); i++) {
-			Point p_a = points.get(i - 1);
+			Point p_a = points.get(i-1);
 			Point p_b = points.get(i);
 			double d = p_a.distance(p_b);
 			if (D + d >= I) {
-				Point q = new Point((int) Math.round((p_a.x + ((I - D) / d) * (p_b.x - p_a.x))),
-						(int) Math.round((p_a.y + ((I - D) / d) * (p_b.y - p_a.y))));
+				double x = p_a.x + ((I - D) / d) * (p_b.x - p_a.x);
+				double y = p_a.y + ((I - D) / d) * (p_b.y - p_a.y);
+				Point q = new Point((int) Math.round(x), (int) Math.round(y));
 				newPoints.add(q);
 				points.add(i, q);
 				D = 0;
@@ -61,6 +82,16 @@ public class Template
 				D += d;
 			}
 		}
+
+		// this makes me sad
+		while (newPoints.size() > Template.N){
+			newPoints.remove(newPoints.size() - 1);
+		}
+		while (newPoints.size() < Template.N){
+			Point p = points_input.remove(points_input.size() - 1);
+			newPoints.add(p);
+		}
+		
 
 		return newPoints;
 	}
@@ -100,7 +131,8 @@ public class Template
 	}
 
 	public static Point[] rotate_to_0(ArrayList<Point> raw_points) {
-		Point[] points = raw_points.toArray(new Point[Template.N]);  
+		Point[] points = toArray(raw_points);
+	
 		return rotate_to_0(points);
 	}
 
