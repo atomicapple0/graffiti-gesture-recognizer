@@ -1,18 +1,39 @@
 import java.awt.*;
-import java.util.*;
-
-import jdk.jshell.Diag;
 
 class Recognizer {
-    public static final double phi = 1.61803399;
+    public static final double phi = 0.61803399;
+
     public Library lib;
+    public char prev_sym;
+    public double prev_score;
     
     public Recognizer() {
         this.lib = Library.load_file("library.dat");
+        for (char sym : this.lib.keys) {
+            if (lib.get(sym).length != Template.N) {
+                throw new Error("Invalid length");
+            }
+        }
     }
 
-    public static Point[] recognize(Point[] points) {
-        return null;
+    public char recognize(Point[] raw_points) {
+        Point[] points = Template.process_gesture(raw_points);
+
+        double b = Double.MAX_VALUE;
+        char best_match = '\0';
+        for (char sym : this.lib.keys) {
+            double d = distance_at_best_angle(points, this.lib.get(sym), -Math.PI / 2, Math.PI / 2, 2 * (Math.PI / 180));
+            if (d < b) {
+                b = d;
+                best_match = sym;
+            }
+        }
+        double score = 1 - b / (0.5 * Math.sqrt(Math.pow(Template.DIMEN,2)));
+
+        this.prev_sym = best_match;
+        this.prev_score = score;
+
+        return best_match;
     }
 
     public static double distance_at_best_angle(Point[] points_input, Point[] points_template, double angle_a, double angle_b, double angle_err) {

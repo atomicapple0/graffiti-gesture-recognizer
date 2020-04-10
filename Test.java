@@ -1,15 +1,11 @@
 class Test{
     public static void main(String[] args) {
         
-        
-        Library lib = Library.load_file("library.dat");
-        
-        char sym = '0';
-        System.out.println(sym);
-        lib.add_raw(sym, Painter.draw());
-        lib.get(sym);
-        
-        
-        
+        Recognizer r = new Recognizer(); //So far only works with english alphabet
+        while (true) {
+            char sym = r.recognize(Painter.draw());
+            System.out.println(sym);
+        }
+            
     }
 }

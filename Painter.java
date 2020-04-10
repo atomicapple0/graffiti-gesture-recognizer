@@ -4,6 +4,7 @@ import java.util.*;
 import javax.swing.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
+import javafx.util.Pair;
 
 
 @SuppressWarnings("serial")
@@ -86,23 +87,20 @@ public Painter(ArrayList<Point> points, String mode) {
         }
         f.dispose();
         
-        return((Point[]) HI.points.toArray(new Point[HI.points.size()]));
+        return Template.toArray(HI.points, HI.points.size());
     }
 
     public static ArrayList<Point> display(Point[] points_input){
         ArrayList<Point> points = new ArrayList<Point>(Arrays.asList(points_input));
-        double ratio = (0.75) * (VIEWER_DIMEN / Template.DIMEN);
-        for (Point p : points) {
-            p.x *= ratio;
-            p.y *= ratio;
-        }
+        Pair<Point, Point> bb = Template.bounding_box(points_input);
+
         final JFrame f = new JFrame();
 
         Painter HI = new Painter(points, "r");
 
         f.add(HI);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.setSize(VIEWER_DIMEN, VIEWER_DIMEN);
+        f.setSize(bb.getValue().x + 200, bb.getValue().y + 200);
         f.setVisible(true);
 
         while(!HI.click){
@@ -113,6 +111,7 @@ public Painter(ArrayList<Point> points, String mode) {
         
         return(HI.points);
     }
+    
 
 
 }
